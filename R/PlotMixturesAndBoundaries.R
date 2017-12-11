@@ -41,7 +41,7 @@ dec = BayesDecisionBoundaries(Means,SDs,Weights,IsLogDistribution,Ycoor=T)
   #print('dec was a list, assuming usage of BayesDecisionBoundaries()')
 #}
 # Plot Gaussians
-PlotMixtures(Data,Means,SDs,Weights,IsLogDistribution,SingleColor,MixtureColor,DataColor=DataColor, xlab = xlab, ylab  = ylab,...)
+PlotMixtures(Data,Means,SDs,Weights,IsLogDistribution,SingleColor,MixtureColor,DataColor=DataColor, SingleGausses=T,xlab = xlab, ylab  = ylab,...)
 
 # intersecions
 for (i in 1:length(DecisionBoundaries)){
