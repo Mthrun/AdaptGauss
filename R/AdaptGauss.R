@@ -7,6 +7,7 @@ AdaptGauss = function(Data,Means=NaN,SDs=NaN,Weights=NaN,ParetoRadius=NaN,LB=NaN
 # RMS <- V$RMS 
 # BayesBoundaries <- V$BB
 #  
+  
 #    adapt interactively a Gaussians Mixture Model GMM to the empirical PDF of the data such that N(M,S)*W is a  model for Data
 #   
 #    INPUT
