@@ -26,7 +26,7 @@ AdaptLGL = function(Data,Means=NaN,SDs=NaN,Weights=NaN,ParetoRadius=NaN,LB=NaN,H
   Data; #Bricht bei nicht existierendem Bezeichner ab
   ## Starte Shiny
   #library(shiny)
-  rsampleAdaptGauss = function(k,n,uniq=TRUE,exact=TRUE){
+  rsampleAdaptLGL = function(k,n,uniq=TRUE,exact=TRUE){
     
     index = ceiling(runif(k)*n) # Calculate k of n values.
     if(uniq==TRUE){# if unique, avoide duplicates.
