@@ -25,10 +25,12 @@ Pareto Density Estimation (PDE) is a method for the estimation of probability de
 \note{This is the best density estimation to judge Gaussian Mixtures  of the data see [Ultsch 2003]
 }
 \examples{
+\donttest{
 			data = c(rnorm(1000),rnorm(2000)+2,rnorm(1000)*2-1)
 			pdeVal        <- ParetoDensityEstimation(data)
 			plot(pdeVal$kernels,pdeVal$paretoDensity,type='l',xaxs='i',
 			yaxs='i',xlab='Data',ylab='PDE') 
+			}
   			
 }
 \references{Ultsch, A.: Pareto density estimation: A density estimation for knowledge discovery, in  Baier, D.; Werrnecke, K. D., (Eds), Innovations in classification, data science, and information systems, Proc Gfkl 2003, pp 91-100, Springer, Berlin, 2005.}

@@ -105,7 +105,7 @@ Intersect2Mixtures <- function(Mean1,SD1,Weight1,Mean2,SD2,Weight2,IsLogDistribu
       pdfkt<-Data*0
       negDataInd<-which(Data<0)
       pdfkt[negDataInd] <- dlnorm(-Data[negDataInd],meanlog=mu,sdlog=sig)
-      plot(Data,pdfkt)
+      #plot(Data,pdfkt)
     }
     return (pdfkt) 
     

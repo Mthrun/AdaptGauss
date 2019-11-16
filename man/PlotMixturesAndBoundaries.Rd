@@ -12,8 +12,15 @@
 	Magenta are the Bayes boundaries
 }
 \usage{
-PlotMixturesAndBoundaries(Data, Means, SDs, Weights, IsLogDistribution,
- SingleColor, MixtureColor,DataColor, BoundaryColor, xlab, ylab, ...)
+PlotMixturesAndBoundaries(Data, Means, SDs, Weights, 
+
+IsLogDistribution = rep(FALSE, length(Means)), SingleColor = "blue",
+
+MixtureColor = "red", DataColor = "black",
+
+BoundaryColor = "magenta", xlab, ylab, 
+				   
+ SingleGausses =TRUE, \dots)
 }
 
 \arguments{
@@ -29,10 +36,8 @@ PlotMixturesAndBoundaries(Data, Means, SDs, Weights, IsLogDistribution,
   \item{BoundaryColor}{Optional, Color of bayesian boundaries}
     \item{xlab}{Optional, x label, see \code{\link{plot}}}
 	  \item{ylab}{Optional, y label, ee \code{\link{plot}}}
+	  \item{SingleGausses}{Optional,  SingleGausses=T than components of the mixture in blue will be shown.}
 		\item{...}{Optional, see \code{\link{plot}} for plot properties and for \code{SingleGausses} \code{\link{PlotMixtures}}}
-}
-\details{
-you may also set SingleGausses=T than components of the mixture in blue will be shown.
 }
 
 \author{Michael Thrun}

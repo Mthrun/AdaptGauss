@@ -30,6 +30,7 @@ Chi2testMixtures <- function(Data,Means,SDs,Weights,IsLogDistribution = Means*0,
 # Autor: RG 06/15
 #1.Editor: MT 08/2015 plotten, Fehlerabfang bei kleinen Datensaetzen
 #2.Editor: FL 12/16 moeglichkeit, chi2 dist. direkt in tabelle nachzuschlagen eingefuegt.
+  #3.Editor: MT 03/19 deutliche effizienzsteigerung eingepflegt.
   
 par.defaults <- par(no.readonly=TRUE)
 if(length(IsLogDistribution) == 1 && IsLogDistribution == 0) 
@@ -128,11 +129,32 @@ if(AnzBins<100)  AnzRepetitions = 2000
 if(AnzBins<10)   AnzRepetitions = 5000
 
 if(MonteCarloSampling){
+  #MT 2019/03: das waere die schnelle version, grad nur keine zeit das anzupassen
+  # nB1 <- AnzBins
+  # delt <- 3/nB1
+  # fuzz <- 1e-7 * c(-delt, rep.int(delt, nB1))
+  # breaks <- seq(0, 3, by = delt) + fuzz
+  
   RandGMMDataDiff = matrix(0,AnzBins,AnzRepetitions)
+  #zukeunftig with parSapply
+  Ri=sapply(1:AnzRepetitions, function(i,...) return(RandomLogGMM(...)),Means,SDs,Weights,IsLogDistribution,AnzData)
+  #zukeunftig with parApply
+  RandNrInBini=apply(Ri,MARGIN = 2, function(R,BinLimits) hist(Re(abs(R)),c(0,BinLimits,max(abs(R))),plot=F)$counts,BinLimits)
+  
+  #MT 2019/03: das waere die schnelle version, grad nur keine zeit das anzupassen
+  #noch in apply zu integrieren
+  # nB1 <- 99
+  # delt <- 3/nB1
+  # fuzz <- 1e-7 * c(-delt, rep.int(delt, nB1))
+  # breaks <- seq(0, 3, by = delt) + fuzz
+  #RandNrInBin=.Call(graphics:::C_BinCount, x, breaks, TRUE, TRUE)
+  
   for(i in 1:AnzRepetitions){
-    R = RandomLogGMM(Means,SDs,Weights,IsLogDistribution,AnzData)
+    #R = Ri[,i]#RandomLogGMM(Means,SDs,Weights,IsLogDistribution,AnzData)
     #BinLimits = c(0,BinLimits,max(abs(R)))
-    RandNrInBin = hist(Re(abs(R)),c(0,BinLimits,max(abs(R))),plot=F)$counts  # R's schnelle Funktion benutzen
+    #RandNrInBin = hist(Re(abs(R)),c(0,BinLimits,max(abs(R))),plot=F)$counts  # R's schnelle Funktion benutzen
+    RandNrInBin=as.vector(RandNrInBini[,i])
+    
     #BinLimits = BinLimits[2:(length(BinLimits)-1)]
     RandNrInBin[2] = RandNrInBin[1]+RandNrInBin[2]
     RandNrInBin[length(RandNrInBin)-1] = RandNrInBin[length(RandNrInBin)-1]+RandNrInBin[length(RandNrInBin)]

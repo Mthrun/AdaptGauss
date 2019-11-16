@@ -306,7 +306,6 @@ if(!missing(ListOfAdaptGauss)){
       
       output$minMean <- renderUI({
         befehl$updateMinMax
-        #print("Erstelle Min/Max f?r M/S/W")
         numericInput("minMean", 
                      label = h6("Min Mean"), 
                      value = signif(MLimit[1],digits=nSignif)
@@ -352,12 +351,18 @@ if(!missing(ListOfAdaptGauss)){
       ## Interaktive Variablen: befehl$... fungiert als Funktionsaufruf.
       befehl <- reactiveValues(plot = 0, updateSlider=0, updateSliderCurrGauss=0, drawSliderMSW=0, updateRMS=0, updateMinMax=0) #Signal zum update des Plots / der Slider
       
-      ### Observes fuer die numeric input boxes
+      
+      
+      # die numerischen eingabekaesten (numericM, ...) werden aktualisiert, 
+      #    sollte sich der Wert eines sliders veraendern
       observe({
         updateNumericInput(session, "numericM", value=input$M)
         updateNumericInput(session, "numericS", value=input$S)
         updateNumericInput(session, "numericW", value=input$W)
       })
+      
+      # die Slider werden aktualisiert, sollte sich der Wert 
+      #    eines numerischen eingabekaesten veraendern
       observe({
         input$numericM
         input$numericS
@@ -365,13 +370,21 @@ if(!missing(ListOfAdaptGauss)){
         # der numeric input darf nicht zu scnell andere werte updaten sonst gibt es eine endlosschleife mit dem slider
         if(MonitorStopReactions==F){
           MonitorStopReactions<<-T
-          updateSliderInput(session, "M", value=input$numericM)
-          updateSliderInput(session, "S", value=input$numericS)
-          updateSliderInput(session, "W", value=input$numericW)
+          if(is.numeric(input$numericM))
+            updateSliderInput(session, "M", value=input$numericM)
+          if(is.numeric(input$numericS))
+            updateSliderInput(session, "S", value=input$numericS)
+          if(is.numeric(input$numericW))
+            updateSliderInput(session, "W", value=input$numericW)
+          # MonitorStopReactions<<-F
         }
       })
       
+      
       # alle 500ms darf der numeric input wieder einen neuen wert setzen
+      #  solange MonitorStopReactions auf False steht, kann ein Input System seinen Wert
+      #    veraendern und auf das analoge gegenstueck uebertragen (slider <-> kaesten)
+      #    sobald ein system etwas aendert ist das erste was es tut, den Flag zu aktivieren
       validationTimer <- reactiveTimer(500)
       observe({
         validationTimer()
@@ -380,6 +393,7 @@ if(!missing(ListOfAdaptGauss)){
       
       ## Observe Part: warte auf Input     
       observe({ # Grenzen f?r die Werte von means, sdevs und weights
+        #print("AdaptGauss: Enforce Limits for Mean, Sdev and Weight")
         if (!is.null(input$minMean)){
           if (  is.numeric(input$minMean)  &&  input$minMean<min(GM)  )  MLimit[1] <<- input$minMean
           if (  is.numeric(input$maxMean)  &&  input$maxMean>max(GM)  )  MLimit[2] <<- input$maxMean
@@ -394,6 +408,7 @@ if(!missing(ListOfAdaptGauss)){
       
       # Normalisiert alle Gaussians
       observe({
+        #print("AdaptGauss: Normalize All")
         #print("Normalize All")
         if (input$normAll>0){
           sumWeight <- sum(GW)
@@ -407,6 +422,7 @@ if(!missing(ListOfAdaptGauss)){
       })
       # Normalisiert andere Gaussians (alle ausser dem aktuellen)
       observe({
+      #print("AdaptGauss: Normalize Other")
         #print("Normalize Other")
         if (input$normOth>0){
           sumWeight <- sum(GW)
@@ -424,6 +440,7 @@ if(!missing(ListOfAdaptGauss)){
       })
       # wechsel den aktuellen Gauss
       observe({
+      #print("AdaptGauss: Update CurGauss")
         #print("Update currGauss")
         if (!is.null(input$currGauss)){
           currGauss <<- input$currGauss
@@ -433,6 +450,7 @@ if(!missing(ListOfAdaptGauss)){
       })
       #Erneuert Slider f?r M/S/W, (zB. wenn der Gauss gewechselt wurde)
       observe({
+      #print("AdaptGauss: Update Slider for M, S and W")
         befehl$updateSlider
         befehl$updateCurrGauss
         #print("Update Slieder M/S/W")
@@ -444,6 +462,7 @@ if(!missing(ListOfAdaptGauss)){
       
       # Erneuert slider f?r den aktuellen Gauss (falls numGauss==0 --> lehrer output --> slider wird nicht angezeigt)
       observe({
+      #print("AdaptGauss:Update CurGauss Slider")
         befehl$updateSliderCurrGauss
         if (numGauss>1){
           output$sliderCurrGauss <- renderUI({
@@ -459,6 +478,7 @@ if(!missing(ListOfAdaptGauss)){
       #Erneuert Werte f?r M/S/W, wenn der Slider bewegt wird
       observe({
         #print("Refresh Values for M")
+      #print("AdaptGauss:RefreshM")
         if (!is.null(input$M)){
           GM[currGauss] <<- input$M
           iBefehl <<- iBefehl+1
@@ -466,6 +486,7 @@ if(!missing(ListOfAdaptGauss)){
         }
       })
       observe({
+      #print("AdaptGauss:RefreshS")
         #print("Refresh Values for S")
         if (!is.null(input$S)){
           GS[currGauss] <<- input$S
@@ -474,6 +495,7 @@ if(!missing(ListOfAdaptGauss)){
         }
       })
       observe({
+      #print("AdaptGauss:RefreshW")
         #print("Refresh Values for W")
         if (!is.null(input$W)){
           GW[currGauss] <<- input$W
@@ -490,13 +512,14 @@ if(!missing(ListOfAdaptGauss)){
       
       # Starte EMGauss()
       observe({ 
+      #print("AdaptGauss:EMGauss")
         GMSave <<- GM
         GSSave <<- GS
         GWSave <<- GW
         
         numGaussSave <<- numGauss 
         if (input$expMax>0){
-          print("Expectation Maximation")
+        print("Expectation Maximation")
           Var <- EMGauss(data,length(GM),GM,GS,GW,numIterations,fast=fast)
           GM <<- Var$Means
           GS <<- Var$SDs
@@ -540,6 +563,7 @@ if(!missing(ListOfAdaptGauss)){
       
       # Lade Werte (wurden vor Expectation Maximation gespeichert)
       observe({
+        print("AdaptGauss: Restore Previous Values")
         if (input$restore>0){
           print("Restore previous Values")
           GM <<- GMSave
@@ -556,6 +580,7 @@ if(!missing(ListOfAdaptGauss)){
       
       #Lade Werte f?r best RMS
       observe({
+        #print("AdaptGauss:RestoreBestRMS")
         if (input$RestoreBestRMS>0){
           print("Restore Values of Best RMS")
           GM <<- GMBestRMS
@@ -577,6 +602,7 @@ if(!missing(ListOfAdaptGauss)){
       # Plotten der Grafik (nur bei Befehl (befehl$plot))
       output$PDE <- renderPlot({
         befehl$plot
+        #print("AdaptGauss:renderPlot")
         #print("PDE estimation using ParetoDensityEstimation... ");
         #Plotte Pareto Density
         plot(Kernels, ParetoDensity,xlim=xlimit,ylim=ylimit, col="black", axes = FALSE, xlab = "Data", ylab = "Pareto Density Estimation", type="l", lwd=3,xaxs='i',yaxs='i')

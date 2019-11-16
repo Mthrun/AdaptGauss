@@ -16,6 +16,7 @@ RandomLogGMM=function(Means,SDs,Weights,IsLogDistribution,TotalNoPoints=1000){
   # NOTA: die Log-Normalverteilung ist generaisiert d.h.: L(Means,SDs) = sign(Means)*lognrnd(abs(Means),SDs);
   #author: ?, RG
   #1.Eitor: MT 06/2015
+  #2.Editor: MT 03/19 deutliche effizienzsteigerung eingepflegt fuer normale gausse.
   L= length(Means)
   AnzPoints = round(Weights*TotalNoPoints*1.1)
   # Verteilung der Mischungen  erzeugen
@@ -28,7 +29,7 @@ RandomLogGMM=function(Means,SDs,Weights,IsLogDistribution,TotalNoPoints=1000){
   }
   if(missing(IsLogDistribution))
     IsLogDistribution=Means*0
-  
+  requireNamespace('dqrng')
   for(d in 1:L){
     if(IsLogDistribution[d]==1){
       # Mixi = symlogrnd(Means[d],SDs[d],AnzPoints[d],1)
@@ -41,17 +42,33 @@ RandomLogGMM=function(Means,SDs,Weights,IsLogDistribution,TotalNoPoints=1000){
       mu <- temp$mu
       sig <- temp$sig
       n <- AnzPoints[d]*1
-      Mixi <- matrix(sign(Means) * rlnorm(n, abs(mu), sig), AnzPoints[d], 1)
+      Mixi <- matrix(sign(Means[d]) * rlnorm(n, abs(mu), sig), AnzPoints[d], 1)
     }else{ # Mormalverteilung
       #Mixi = normrnd(Means[d],SDs[d],AnzPoints[d],1) # Mix(i) als Gauss erzeugen
       x <- 1*AnzPoints[d]
-      Mixi <- matrix(rnorm(n=x, mean=Means[d], sd=SDs[d]), nrow=AnzPoints[d], ncol=1)     
+      #Mixi <- matrix(rnorm(n=x, mean=Means[d], sd=SDs[d]), nrow=AnzPoints[d], ncol=1)   
+      #MT 2019/03: das ist die schnelle version fuer den bottleneck
+      Mixi <- matrix(dqrng::dqrnorm(n=x, mean=Means[d], sd=SDs[d]), nrow=AnzPoints[d], ncol=1)   
+      
     }
     Mix = c(Mix,Mixi)
   }  # for d
   # hier enthaelt Mix die der Vereilung entsprechende Punkte  
   # Dureinanderwuerfeln und auf gewuenschte Anzahl bringen
-  Ind = sample(c(1:sum(AnzPoints)),TotalNoPoints)
+  
+  #MT 2019/03: das ist die schnelle version, noch anzupassen
+  #internal disabled for cran
+  # if(sum(AnzPoints)>TotalNoPoints)
+  #   Ind = .Internal(sample(sum(AnzPoints),TotalNoPoints, FALSE, NULL))
+  # else
+  #   Ind = .Internal(sample(sum(AnzPoints),TotalNoPoints, TRUE, NULL))
+  # 
+  if(sum(AnzPoints)>TotalNoPoints)
+    Ind = sample(sum(AnzPoints),TotalNoPoints, FALSE, NULL)
+  else
+    Ind = sample(sum(AnzPoints),TotalNoPoints, TRUE, NULL)
+  
+  #Ind = sample(c(1:sum(AnzPoints)),TotalNoPoints)
   GMM=Mix[Ind]
   return(GMM)  
 }

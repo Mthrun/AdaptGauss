@@ -1,4 +1,5 @@
-BayesClassification = function(Data,Means,SDs,Weights,IsLogDistribution=Means*0,ClassLabels=c(1:length(Means))){
+BayesClassification = function(Data,Means,SDs,Weights,IsLogDistribution=Means*0,
+                               ClassLabels=c(1:length(Means))){
 # Cls = BayesClassification(Data,M,S,W) 
 # [Cls, DecisonBoundaries] = BayesClassification(Data,M,S,W,IsLogDistribution,ClassLabels) 
 # Bayes Klassifikation den Daten zuordnen

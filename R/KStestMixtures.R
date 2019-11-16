@@ -20,7 +20,7 @@ KStestMixtures=function(Data,Means,SDs,Weights,IsLogDistribution=Means*0,PlotIt=
 # CDFGaussMixture                  such that plot(DataKernels,DataCDF) gives the cdf(Data)
 
 # MT 2015, reimplemented from ALUs matlab version
-
+#1.Editor: MT 03/19 deutliche effizienzsteigerung eingepflegt fuer normale gausse.
 par.defaults <- par(no.readonly=TRUE)
 
 ################################
@@ -53,7 +53,43 @@ KernelMaxDiff   = DataKernels[MaxInd]         # wo steckt der groesste Unterschi
 DataCDFmaxDiff  = DataCDF[MaxInd]             # wo steckt der groesste Unterschied
 GMMCDFmaxDiff   = CDFGaussMixture[MaxInd]      # wo steckt der groesste Unterschied
 
-         
+regularize.values_spec <- function(x, y,HandleTiesFUN=meanC) {
+  #MT: not necessary for this special case
+  # x <- xy.coords(x, y, setLab = FALSE) # -> (x,y) numeric of same length
+  # y <- x$y
+  # x <- x$x
+  # if(any(na <- is.na(x) | is.na(y))) {
+  #   ok <- !na
+  #   x <- x[ok]
+  #   y <- y[ok]
+  # }
+  nx <- length(x)
+
+  o <- order(x)
+      x <- x[o]
+      y <- y[o]
+
+    if (length(ux <- unique(x)) < nx) {
+      # tapply bases its uniqueness judgement on character representations;
+      # we want to use values (PR#14377)
+      #y <- as.vector(tapply(y, match(x,x), meanC))# as.v: drop dim & dimn.
+      #MT: not necessary for this secial case
+     
+      y <- tapply(y, match(x,x), HandleTiesFUN)
+     
+      #requireNamespace('fastmatch')
+      #fmatch is also slower
+      #y <- tapply(y, fastmatch::fmatch(x,x), HandleTiesFUN)
+      #slower
+     # y <- as.vector(fastmatch::ctapply(y, match(x,x), meanC))# 
+      x <- ux
+      #mt:not necessary
+      #stopifnot(length(y) == length(x))# (did happen in 2.9.0-2.11.x)
+    }
+
+  list(x=x, y=y)
+}
+
              
 # Die Miller Funktion via Monte-Carlo errechnen
 AnzData =length(Data)
@@ -62,16 +98,24 @@ if(AnzData<1000) AnzRepetitions = 2000
 if(AnzData<100)  AnzRepetitions = 5000
     
 RandGMMDataDiff = matrix(0,AnzRepetitions,1)
+Ri=sapply(1:AnzRepetitions, function(i,...) return(RandomLogGMM(...)),Means,SDs,Weights,IsLogDistribution,AnzData)
 
 for(i in c(1:AnzRepetitions)){
-   R = RandomLogGMM(Means,SDs,Weights,IsLogDistribution,AnzData)
+   #R = RandomLogGMM(Means,SDs,Weights,IsLogDistribution,AnzData)
+   R = Ri[,i]
    #[RandCDF,RandKernels] = ecdfUnique(R)
    dummy <- ecdf(R) # cdf(Diff)
    RandCDF <- c(0,get("y", envir = environment(dummy)))
    RandKernels <- c(knots(dummy)[1],knots(dummy))#CDFuniq# cdf(Data)
    #
    #RandCDF =  interp1(RandKernels,RandCDF,DataKernels, 'linear') #matlab
-   RandCDF = approx(RandKernels,RandCDF,DataKernels, 'linear')$y  # den MaxDiff in cdf(Diff) lokalisieren
+   #MT: resolves ties, order values 
+   regval <- regularize.values_spec(RandKernels, RandCDF) # -> (x,y) numeric of same length
+   y <- regval$y
+   x <- regval$x
+   #MT: then approx is very fast
+   RandCDF = approx(x,y,DataKernels, 'linear')$y  # den MaxDiff in cdf(Diff) lokalisieren
+   
    RandGMMDataDiff[i] = max(abs(CDFGaussMixture-RandCDF),na.rm=TRUE)
    if(!Silent){
      #if(Sys.info()['sysname'] == 'Windows'){
@@ -87,7 +131,7 @@ for(i in c(1:AnzRepetitions)){
     # }                                      
    }
 }# for i
-AllDiff =  RandGMMDataDiff                     # die Verteilung aller Differenzen
+AllDiff =  RandGMMDataDiff#[is.finite(RandGMMDataDiff)]                     # die Verteilung aller Differenzen
 #matlab
 #[AllDiffCDF,AllDiffKenels] =  ecdfUnique(AllDiff);  # cdf(Diff)
 #R
@@ -100,7 +144,13 @@ AllDiffKernels=environment(dummy)$x
 #matlab
 #MaxDiffCDFwert = interp1([0;AllDiffKenels],[0;AllDiffCDF],MaxDiff, 'linear');  # den MaxDiff in cdf(Diff) lokalisieren
 #R
-MaxDiffCDFwert = approx(rbind(0,unname(AllDiffKernels)),rbind(0,unname(AllDiffCDF)),xout=MaxDiff, 'linear')$y  # den MaxDiff in cdf(Diff) lokalisieren
+regval <- regularize.values_spec(rbind(0,unname(AllDiffKernels)), rbind(0,unname(AllDiffCDF))) # -> (x,y) numeric of same length
+y1 <- regval$y
+x1 <- regval$x
+MaxDiffCDFwert = approx(x1,y1,xout=MaxDiff, 'linear')$y  # den MaxDiff in cdf(Diff) lokalisieren
+
+#MaxDiffCDFwert = linearapprox(rbind(0,unname(AllDiffKernels)),rbind(0,unname(AllDiffCDF)),MaxDiff,)  # den MaxDiff in cdf(Diff) lokalisieren
+#print(MaxDiffCDFwert)
 if(is.na(MaxDiffCDFwert)){ ##Wenn nicht approximierbar
   if(MaxDiff>max(AllDiffKernels,na.rm=T)){#Wenn Ursache daran liegt, das kein x-werte gefunden werden kann (zu weit nach rechts in der ecdf)
     MaxDiffCDFwert=1
@@ -173,7 +223,7 @@ if(PlotIt ==1){
     #kleiner Pvalue: schlecht
 		#grosser pvalue: gut
 		par(par.defaults)
-return(list(PvalueKS=1-PvalueKS,DataKernels=DataKernels,DataCDF=DataCDF,CDFGaussMixture=CDFGaussMixture,Controls))
+return(invisible(list(PvalueKS=1-PvalueKS,DataKernels=DataKernels,DataCDF=DataCDF,CDFGaussMixture=CDFGaussMixture,Controls)))
 }
 
 
