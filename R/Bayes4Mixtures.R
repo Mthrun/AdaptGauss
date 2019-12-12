@@ -30,7 +30,7 @@ AnzKernels <- length(Kernels)
 PDataGivenClass <- matrix(0,AnzKernels,AnzMixtures);
 for(i in c(1:AnzMixtures)){
 	if( IsLogDistribution[i] == 1 ){ # LogNormal
-		PDataGivenClass[,i] <- symlognpdf(Kernels,Means[i],SDs[i]); # LogNormaldichte. Achtung: Muss gespiegelt werden fuer negative Werte.
+		PDataGivenClass[,i] <- Symlognpdf(Kernels,Means[i],SDs[i]); # LogNormaldichte. Achtung: Muss gespiegelt werden fuer negative Werte.
 	}else{
 		PDataGivenClass[,i] <- dnorm(Kernels,Means[i],SDs[i]); # Gaussian
 	}#end if(IsLogDistribution[i] == 1)
@@ -117,65 +117,4 @@ title(ylab='Posteriori',xlab=xlab)
 ##
 res <- list(Posteriors = Posteriors, NormalizationFactor=NormalizationFactor, PClassGivenData = PClassGivenData)
 return (res) 
- 
-
-# symlognpdf
-#########################################################
-symlognpdf <- function(Data,Means,SDs){
-  #pdf = symlognpdf(Data,Means,SDs);
-  # for Means>0 same as dlnorm(Data,Means,SDs); (Dichte der log-Normalverteilung)
-  # for Means < 0: mirrored at y axis
-  #INPUT
-  #Data[1:n]  x-values
-  #Means,SDs        Mean and Sdev of lognormal
-  
-  temp<-symlognSigmaMue(Means,SDs)
-  mu<-temp$mu
-  sig<-temp$sig
-  if(Means>=0){
-    pdfkt<-dlnorm(Data,meanlog=mu,sdlog=sig)  
-  }else{
-    pdfkt<-Data*0
-    negDataInd<-which(Data<0)
-    pdfkt[negDataInd] <- dlnorm(-Data[negDataInd],meanlog=mu,sdlog=sig)
-    #plot(Data,pdfkt)
-  }
-  return (pdfkt) 
-  
-  symlognSigmaMue <-  function(Means,SDs){
-    
-    variance<-log(SDs*SDs/(Means*Means)+1)
-    sig<-sqrt(variance)
-    mu<-log(abs(Means))-0.5*variance
-    return (list(variance=variance,sig=sig,mu=mu)) 
-    
-  }
-  
-}
-#########################################################
-
-# zeros
-#########################################################
-zeros <-function (n,m=n,o=0) {
-  # zeros(n)     returns an n-by-n matrix of 0s. 
-  # zeros(n,1)   returns a vector of 0s 
-  # zeros(n,m)   returns an n-by-m matrix of zeros
-  # zeros(n,m,o) returns an 3D matrix  of zeros
-  
-  # ALU
-  
-  if (m==1) { # vector wird zurueckgegeben
-    return(c(1:n)*0) ;   
-  }else{      # return n-by-m matrix of ones.         
-    if  (o==0){
-      return(matrix(0,n,m));
-    }else{   #3D matrix
-      nullen = rep(0, m*n*o);  # soviele nullen wie in die 3D matrix pasen
-      return(array(nullen,c(n,m,o)));
-      
-    } # end  if  (o==0)
-  } # end if (m==1) 
-} # end  function  zeros
-#########################################################
-
 }

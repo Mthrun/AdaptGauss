@@ -49,13 +49,13 @@ Intersect2Mixtures <- function(Mean1,SD1,Weight1,Mean2,SD2,Weight2,IsLogDistribu
     # X sind Werte an denen die Gaussians ausgewertet werden
     
     if(IsLogDistribution[1] == TRUE)
-      N1 = symlognpdf(X,Mean1,SD1)*Weight1 # LogNormal 
+      N1 = Symlognpdf(X,Mean1,SD1)*Weight1 # LogNormal 
     else # N1 ist normalverteilt
       N1 = dnorm(X,Mean1,SD1)*Weight1  # Gauss
     
     
     if(IsLogDistribution[2] == TRUE)
-      N2 = symlognpdf(X,Mean2,SD2)*Weight2 # LogNormal 
+      N2 = Symlognpdf(X,Mean2,SD2)*Weight2 # LogNormal 
     else # N2 ist normalverteilt
       N2 = dnorm(X,Mean2,SD2)*Weight2  # Gauss
     
@@ -84,41 +84,4 @@ Intersect2Mixtures <- function(Mean1,SD1,Weight1,Mean2,SD2,Weight2,IsLogDistribu
   #  vline(CutX); hline(CutY)
   
   return(list(CutX=CutX,CutY=CutY))
-
-
-  # symlognpdf
-  #########################################################
-  symlognpdf <- function(Data,M,S){
-    #pdf = symlognpdf(Data,M,S);
-    # for M>0 same as dlnorm(Data,M,S); (Dichte der log-Normalverteilung)
-    # for M < 0: mirrored at y axis
-    #INPUT
-    #Data[1:n]  x-values
-    #M,S        Mean and Sdev of lognormal
-    
-    temp<-symlognSigmaMue(M,S)
-    mu<-temp$mu
-    sig<-temp$sig
-    if(M>=0){
-      pdfkt<-dlnorm(Data,meanlog=mu,sdlog=sig)  
-    }else{
-      pdfkt<-Data*0
-      negDataInd<-which(Data<0)
-      pdfkt[negDataInd] <- dlnorm(-Data[negDataInd],meanlog=mu,sdlog=sig)
-      #plot(Data,pdfkt)
-    }
-    return (pdfkt) 
-    
-    symlognSigmaMue <-  function(M,S){
-      
-      variance<-log(S*S/(M*M)+1)
-      sig<-sqrt(variance)
-      mu<-log(abs(M))-0.5*variance
-      return (list(variance=variance,sig=sig,mu=mu)) 
-      
-    }
-    
-  }
-  #########################################################
-  
 }

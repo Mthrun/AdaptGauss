@@ -47,7 +47,7 @@ AnzGaussians <- length(Means)
 if(SingleColor  != 0){
 # 	for(g in c(1:AnzGaussians)){
 # 		if(IsLogDistribution[g] == TRUE){ # LogNormal
-# 			SingleGaussian[,g] <- symlognpdf(X,Means[g],SDs[g])*Weights[g] # LogNormal
+# 			SingleGaussian[,g] <- Symlognpdf(X,Means[g],SDs[g])*Weights[g] # LogNormal
 # 		}else{ # Gaussian
 # 			SingleGaussian[,g] = dnorm(X,Means[g],SDs[g])*Weights[g]
 # 		}# if IsLogDistribution(i) ==T

@@ -18,40 +18,6 @@ Pdf4Mixtures=function(Data,Means,SDs,Weights,IsLogDistribution,PlotIt=F){
 # author: MT 01/2016 ausgelagert von  PlotMixtures
 # Note: Funktionsnamen vereinheitlicht mit LikelihoodRatio4Mixtures, LogLikelihood4Mixtures, Chi2testMixtures, CDFMixtures, KStestMixtures, in matlab unter PdfForMixes
 
-
-# symlognpdf
-#########################################################
-symlognpdf <- function(Data,M,S){
-  #pdf = symlognpdf(Data,M,S);
-  # for M>0 same as dlnorm(Data,M,S); (Dichte der log-Normalverteilung)
-  # for M < 0: mirrored at y axis
-  #INPUT
-  #Data[1:n]  x-values
-  #M,S        Mean and Sdev of lognormal
-  
-  temp<-symlognSigmaMue(M,S)
-  mu<-temp$mu
-  sig<-temp$sig
-  if(M>=0){
-    pdfkt<-dlnorm(Data,meanlog=mu,sdlog=sig)  
-  }else{
-    pdfkt<-Data*0
-    negDataInd<-which(Data<0)
-    pdfkt[negDataInd] <- dlnorm(-Data[negDataInd],meanlog=mu,sdlog=sig)
-    plot(Data,pdfkt)
-  }
-  return (pdfkt) 
-  
-  symlognSigmaMue <-  function(M,S){
-    
-    variance<-log(S*S/(M*M)+1)
-    sig<-sqrt(variance)
-    mu<-log(abs(M))-0.5*variance
-    return (list(variance=variance,sig=sig,mu=mu)) 
-    
-  }
-  
-} # end symlognpdf
 #########################################################
   if(missing(IsLogDistribution)) 
 		IsLogDistribution = rep(FALSE,length(Means))
@@ -62,7 +28,7 @@ symlognpdf <- function(Data,M,S){
   GaussMixture=Data*0
   for(g in c(1:AnzGaussians)){
     if(IsLogDistribution[g] == TRUE){ # LogNormal 
-      PDF4modes[,g] <- symlognpdf(Data,Means[g],SDs[g]) # LogNormal 
+      PDF4modes[,g] <- Symlognpdf(Data,Means[g],SDs[g]) # LogNormal 
     }else{ # Gaussian
       PDF4modes[,g] = dnorm(Data,Means[g],SDs[g])
     }# if IsLogDistribution(i) ==T  
