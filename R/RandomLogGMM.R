@@ -29,7 +29,7 @@ RandomLogGMM=function(Means,SDs,Weights,IsLogDistribution,TotalNoPoints=1000){
   }
   if(missing(IsLogDistribution))
     IsLogDistribution=Means*0
-  requireNamespace('dqrng')
+  #requireNamespace('dqrng')
   for(d in 1:L){
     if(IsLogDistribution[d]==1){
       # Mixi = symlogrnd(Means[d],SDs[d],AnzPoints[d],1)
@@ -47,9 +47,15 @@ RandomLogGMM=function(Means,SDs,Weights,IsLogDistribution,TotalNoPoints=1000){
       #Mixi = normrnd(Means[d],SDs[d],AnzPoints[d],1) # Mix(i) als Gauss erzeugen
       x <- 1*AnzPoints[d]
       #Mixi <- matrix(rnorm(n=x, mean=Means[d], sd=SDs[d]), nrow=AnzPoints[d], ncol=1)   
-      #MT 2019/03: das ist die schnelle version fuer den bottleneck
-      Mixi <- matrix(dqrng::dqrnorm(n=x, mean=Means[d], sd=SDs[d]), nrow=AnzPoints[d], ncol=1)   
       
+	  #MT 2019/03: das ist die schnelle version fuer den bottleneck
+      #Mixi <- matrix(dqrng::dqrnorm(n=x, mean=Means[d], sd=SDs[d]), nrow=AnzPoints[d], ncol=1)   
+      # 2019/12: Using Ralf's Stubner suggestions
+	  if(requireNamespace("dqrng", quietly = TRUE)){
+		Mixi <- matrix(dqrng::dqrnorm(n=x, mean=Means[d], sd=SDs[d]), nrow=AnzPoints[d], ncol=1)
+	  }else{
+		Mixi <- matrix(rnorm(n=x, mean=Means[d], sd=SDs[d]), nrow=AnzPoints[d], ncol=1)   
+	  }
     }
     Mix = c(Mix,Mixi)
   }  # for d
