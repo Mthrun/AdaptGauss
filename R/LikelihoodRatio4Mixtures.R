@@ -73,8 +73,8 @@ if(PlotIt ==TRUE){
    y=NULL
     x=NULL
     kernels=NULL
-   paretoRadius<-ParetoRadius(Data[ValidDataInd])
-   pdeVal        <- ParetoDensityEstimation(Data[ValidDataInd],paretoRadius,NULL)
+   paretoRadius<-DataVisualizations::ParetoRadius(Data[ValidDataInd])
+   pdeVal        <- DataVisualizations::ParetoDensityEstimation(Data[ValidDataInd],paretoRadius,NULL)
    paretoDensity <- pdeVal$paretoDensity*1
    dfframe = as.data.frame(cbind(kernels = pdeVal$kernels, density = paretoDensity))
    #colnames(dfframe)=c('kernels','density')

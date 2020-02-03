@@ -3,7 +3,7 @@ AdaptGauss = function(Data,Means=NaN,SDs=NaN,Weights=NaN,ParetoRadius=NaN,LB=NaN
 # Means <- V$Means
 # SDs <- V$SDs
 # Weights <- V$Weights
-# ParetoRadius <- V$ParetoRadius
+# Pareto_Radius <- V$ParetoRadius
 # RMS <- V$RMS 
 # BayesBoundaries <- V$BB
 #  
@@ -214,14 +214,14 @@ if(!missing(ListOfAdaptGauss)){
       } 
       # Bestimme Pareto Density inkl. Kernels
       if (is.nan(ParetoRadius)){ 
-        ParetoRadius<-ParetoRadius(data) 
+        ParetoRadius<-DataVisualizations::ParetoRadius(data) 
         nRow=length(data)
         #MT: Halte ich nicht fuer plausibel
         #if (nRow>1024){
        #   ParetoRadius = ParetoRadius * 4 /(nRow^0.2);
         #}
       }
-        ParetoDensityEstimationVar <- ParetoDensityEstimation(data,paretoRadius=ParetoRadius);
+        ParetoDensityEstimationVar <- DataVisualizations::ParetoDensityEstimation(data,paretoRadius=ParetoRadius);
       ParetoDensity <- ParetoDensityEstimationVar$paretoDensity;
       Kernels <- ParetoDensityEstimationVar$kernels; 
       # Setze Werte f?r Means, deviations und weights, falls nicht ?bergeben
@@ -603,7 +603,7 @@ if(!missing(ListOfAdaptGauss)){
       output$PDE <- renderPlot({
         befehl$plot
         #print("AdaptGauss:renderPlot")
-        #print("PDE estimation using ParetoDensityEstimation... ");
+        #print("PDE estimation using DataVisualizations::ParetoDensityEstimation... ");
         #Plotte Pareto Density
         plot(Kernels, ParetoDensity,xlim=xlimit,ylim=ylimit, col="black", axes = FALSE, xlab = "Data", ylab = "Pareto Density Estimation", type="l", lwd=3,xaxs='i',yaxs='i')
         axis(1,xlim=xlimit,col="black",las=1) #x-Achse

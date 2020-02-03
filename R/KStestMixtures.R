@@ -196,7 +196,7 @@ if(PlotIt ==1){
   title(paste0('max(Diff) at: ',KernelMaxDiff),xlab='Data',ylab='pdf(GMM), red= pdf(Data)')
   abline(v=KernelMaxDiff,col='green')
 #     subplot(2,2,3);
-			pdeVal2        <- ParetoDensityEstimation(AllDiff)
+			pdeVal2        <- DataVisualizations::ParetoDensityEstimation(AllDiff)
 			xlim=c(min(MaxDiff*0.90,pdeVal2$kernels,na.rm = T),max(pdeVal2$kernels,na.rm = T))
 			ylim=c(0,1.05*max(pdeVal2$paretoDensity,na.rm = T))
 			plot(pdeVal2$kernels,pdeVal2$paretoDensity,type='l',xaxs='i',

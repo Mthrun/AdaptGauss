@@ -23,9 +23,22 @@ PlotMixtures <- function(Data, Means, SDs, Weights = rep(1/length(Means),length(
 # 2. Editor: FL 9/2016: ... wird auch an title weitergegeben
 #Nota: Based on a Version of HeSa Feb14 (reimplemented from ALUs matlab version)
   
-if(!is.null(ParetoRad)) pareto_radius = ParetoRad
-else pareto_radius<-ParetoRadius(Data)
-pdeVal        <- ParetoDensityEstimation(Data,pareto_radius)
+if(missing(Data)) stop('Data is missing.')
+
+if(!inherits(Data,'numeric')){
+  warning('Data is not a numerical vector. calling as.vector')
+  Data=as.vector(Data)
+}
+
+  
+if(length(Data)==length(Means)) warning('Probably "Data" interchanged with "Means" ')
+  
+if(!is.null(ParetoRad)){
+  pareto_radius = ParetoRad
+}else{
+  pareto_radius<-DataVisualizations::ParetoRadius(Data)
+}
+pdeVal        <- DataVisualizations::ParetoDensityEstimation(Data,pareto_radius)
 
 #oldpar <- par(no.readonly = TRUE)
 # labels

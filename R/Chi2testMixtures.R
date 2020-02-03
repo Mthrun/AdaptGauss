@@ -53,7 +53,7 @@ histopt_hlp <- function(Data){
 # Ergaenzung RG, Autor unbekannt
 
   Data[is.infinite(Data)] = NA #MT: Korrektur, bereinigung von Inf
-  optNrOfBins<-OptimalNoBins(Data)
+  optNrOfBins<-DataVisualizations::OptimalNoBins(Data)
   optNrOfBins = min(100,optNrOfBins) #RG: Aus Matlab uebernommen
 # temp<-hist(Data,breaks=optNrOfBins)
  #print(optNrOfBins[1])
@@ -258,8 +258,8 @@ if(PlotIt ==1){
   Xlimits = c(min(Data,na.rm=TRUE),max(Data,na.rm=TRUE))
   
   #PDEplot(Data,xlim=Xlimits,ylim=Ylimits,defaultAxes=FALSE)
-  paretoRadius<-ParetoRadius(Data)
-  pdeVal        <- ParetoDensityEstimation(Data,paretoRadius,NULL)
+  paretoRadius<-DataVisualizations::ParetoRadius(Data)
+  pdeVal        <- DataVisualizations::ParetoDensityEstimation(Data,paretoRadius,NULL)
   paretoDensity <- pdeVal$paretoDensity
   Ylimits = c(min(paretoDensity,na.rm=TRUE),max(paretoDensity,na.rm=TRUE))
   plot(pdeVal$kernels,paretoDensity,typ='l',col="blue",xlim = Xlimits, ylim = Ylimits, xlab = VarName, ylab = '',axes=FALSE,xaxs='i',yaxs='i') 
