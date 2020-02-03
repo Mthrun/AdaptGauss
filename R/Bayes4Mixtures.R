@@ -109,11 +109,12 @@ if(PlotIt==TRUE){
 		points(Data[ind], Posteriors[ind,i], col = color[i],type='l',lwd=lwd)
 	}#end for(i in 2:AnzMixtures)
   }
-}#end if(PlotIt==TRUE)
-axis(1,xlim=xlim,col="black",las=1) #x-Achse
-axis(2,ylim=ylim,col="black",las=1) #y-Achse
+  axis(1,xlim=xlim,col="black",las=1) #x-Achse
+  axis(2,ylim=ylim,col="black",las=1) #y-Achse
 #box() #Kasten um Graphen
-title(ylab='Posteriori',xlab=xlab)
+  title(ylab='Posteriori',xlab=xlab)
+}#end if(PlotIt==TRUE)
+
 ##
 res <- list(Posteriors = Posteriors, NormalizationFactor=NormalizationFactor, PClassGivenData = PClassGivenData)
 return (res) 
