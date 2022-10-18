@@ -6,7 +6,9 @@
   Returns a P value and visualizes for Kolmogorov-Smirnov test of Data versus a given Gauss Mixture Model
 }
 \usage{
-KStestMixtures(Data,Means,SDs,Weights,IsLogDistribution,PlotIt,UpperLimit,Silent)
+KStestMixtures(Data,Means,SDs,Weights,IsLogDistribution,
+
+PlotIt,UpperLimit,NoRepetitions,Silent)
 }
 
 \arguments{
@@ -17,6 +19,7 @@ KStestMixtures(Data,Means,SDs,Weights,IsLogDistribution,PlotIt,UpperLimit,Silent
   \item{IsLogDistribution}{Optional, if IsLogDistribution(i)==1, then mixture is lognormal, default vector of zeros of length 1:L}
   \item{PlotIt}{Optional, Default: FALSE, do a Plot of the compared cdfs and the KS-test distribution (Diff)}
   \item{UpperLimit}{Optional. test only for Data <= UpperLimit, Default = max(Data) i.e all Data.}
+   \item{NoRepetitions}{Optional, default =1000, scalar, Number of Repetitions for monte carlo sampling}
   \item{Silent}{Optional, default=TRUE, If FALSE, shows progress of computation by points (On windows systems a progress bar)}
 	}
 \details{

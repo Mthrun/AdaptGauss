@@ -596,7 +596,7 @@ if(!missing(ListOfAdaptGauss)){
       })
       
       observeEvent(input$ChiSquareAnalysis,{
-        Chi2testMixtures(Data, GM, GS, GW, PlotIt = T)
+        Chi2testMixtures(Data, GM, GS, GW, PlotIt = T,NoRepetitions=50)
       })
       
       # Plotten der Grafik (nur bei Befehl (befehl$plot))

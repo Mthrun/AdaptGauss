@@ -33,18 +33,13 @@ Intersect2Mixtures <- function(Mean1,SD1,Weight1,Mean2,SD2,Weight2,IsLogDistribu
   if(abs(Mean1-Mean2) < 0.00001){ # no differences in mean
     CutX = Mean1   
     CutY = 1
-  }
-  
-  
-  else if((Weight1 == 0) |  (Weight2 == 0)){
+  }else if((Weight1 == 0) |  (Weight2 == 0)){
     CutX=NA 
     CutY=NA 
-  }
-  
-  else{
+  }else{
     # simple solution: look at NrOfIteration points between Modi
     NrOfIteration = 20000
-    dx = (X1- X0)/NrOfIteration
+    dx = (X1 - X0)/NrOfIteration
     X = seq(from = X0, to = X1, by = dx)
     # X sind Werte an denen die Gaussians ausgewertet werden
     
@@ -71,8 +66,7 @@ Intersect2Mixtures <- function(Mean1,SD1,Weight1,Mean2,SD2,Weight2,IsLogDistribu
         CutX = X0
       else
         CutX = X1
-    }
-    else{ # sie schneiden sich        
+    }else{ # sie schneiden sich        
       MinDiff = min(abs(Difference))
       CutInd = which(abs(Difference)==MinDiff,arr.ind=TRUE)
       CutX = X[CutInd]

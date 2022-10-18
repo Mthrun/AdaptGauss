@@ -1,5 +1,5 @@
 QQplotGMM=function(Data,Means,SDs,Weights,IsLogDistribution=Means*0,Line=TRUE,PlotSymbol=20,
-                   xug=NULL,xog=NULL,LineWidth=2,PointWidth=0.8,
+                   xug=NULL,xog=NULL,LineWidth=2,PointWidth=0.8, PositiveDate = FALSE,
                    ylab='Data',main='QQ-plot Data vs GMM',...)
 # QQplotGMM(Data,Means,SDs,Weights,IsLogDistribution,Line,PlotSymbol,xug,xog,LineWidth,PointWidth)
 # Quantile/Quantile = QQ-Plot im Vergleich. zu einem Gauss Mixture Model oder LGL Model
@@ -34,7 +34,9 @@ QQplotGMM=function(Data,Means,SDs,Weights,IsLogDistribution=Means*0,Line=TRUE,Pl
 xlabel='Gaussian Mixture Model'
 
 GMM = RandomLogGMM(Means,SDs,Weights,IsLogDistribution);
-
+if(PositiveDate == TRUE){
+  GMM = GMM[GMM >= 0]
+}
  quants<-qqplot(GMM, Data, pch=PlotSymbol, col="blue", cex=PointWidth, xlab=xlabel, ylab=ylab, main=main,...) #MT: na.rm=TRUE argument weglassen
  if(Line){
  fit<-lm(quants$y~quants$x)

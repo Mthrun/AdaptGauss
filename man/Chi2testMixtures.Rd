@@ -7,6 +7,12 @@
   Returns a P value of a special case of a chi-square test and visualizes data versus a given GMM.
 }
 
+\usage{
+Chi2testMixtures(Data,Means,SDs,Weights,
+
+IsLogDistribution,PlotIt,UpperLimit,VarName,NoRepetitionst)
+}
+
 \arguments{
   \item{Data}{vector of data points (1:n)}
   \item{Means}{vector of Means of Gaussians (1:c)}
@@ -16,7 +22,7 @@
   \item{PlotIt}{Optional, Default: FALSE, do a Plot of the compared cdfs and the KS-test distribution (Diff)}
   \item{UpperLimit}{Optional. test only for Data <= UpperLimit, Default = max(Data) i.e all Data.}
 	\item{VarName}{If PlotIt=TRUE, the name of the inspected variable, default 'Data'}
-	\item{MonteCarloSampling}{If MonteCarloSampling = T montecarlo-sampling will be done for generation of a test statistic.}
+	 \item{NoRepetitions}{Optional, scalar, default =1000, Number of Repetitions for monte carlo sampling}
 }
 \details{
 	The null hypothesis is that the estimated data distribution does not differ significantly from the GMM.

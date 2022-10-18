@@ -1,4 +1,4 @@
-Chi2testMixtures <- function(Data,Means,SDs,Weights,IsLogDistribution = Means*0,PlotIt = 0,UpperLimit=max(Data,na.rm=TRUE),VarName='Data', MonteCarloSampling=T){
+Chi2testMixtures <- function(Data,Means,SDs,Weights,IsLogDistribution = Means*0,PlotIt = 0,UpperLimit=max(Data,na.rm=TRUE),VarName='Data',NoRepetitions){
 # V=Chi2testMixtures(Data,Means,SDs,Weights,IsLogDistribution,PlotIt,UpperLimit)
 # V$Pvalue V$BinCenters V$ObsNrInBin V$ExpectedNrInBin
 #  chi-square test of Data vs a given Gauss Mixture Model
@@ -16,7 +16,7 @@ Chi2testMixtures <- function(Data,Means,SDs,Weights,IsLogDistribution = Means*0,
 # PlotIt                           do a Plot of the compared cdf's and the KS-test distribution (Diff)
 # UpperLimit                       test only for Data <= UpperLimit, Default = max(Data) i.e all Data.
 # VarName                          Variable Name for Plots
-# MonteCarloSampling               Should the Chi2 Distribution be sampled (instead of looked up in a table)
+# NoRepetitions                    Should the Chi2 Distribution be sampled with number of repetitions (instead of looked up in a table for =1)
 # OUTP
 # Pvalue                           Pvalue of a suiting chi-square , Pvalue ==0 if Pvalue <0.001
 # BinCenters                       bin centers
@@ -123,11 +123,19 @@ Chi2Value = sum(Chi2Diffs) # dies soll angeblich Chi2 Verteilt sein
 
 # Die Chi2 Funktion via Monte-Carlo errechnen
 #AnzData =length(Data);
+MonteCarloSampling=TRUE
 AnzBins = length(BinCenters);
-AnzRepetitions = 1000;
-if(AnzBins<100)  AnzRepetitions = 2000
-if(AnzBins<10)   AnzRepetitions = 5000
+  if(missing(NoRepetitions)){
+    NoRepetitions = 1000;
+    if(AnzBins<100)  NoRepetitions = 2000
+    if(AnzBins<10)   NoRepetitions = 5000
+  }else{
+    if(as.numeric(NoRepetitions)<1) NoRepetitions=1
+  }
 
+if(NoRepetitions==1){
+  MonteCarloSampling=FALSE
+}
 if(MonteCarloSampling){
   #MT 2019/03: das waere die schnelle version, grad nur keine zeit das anzupassen
   # nB1 <- AnzBins
@@ -135,9 +143,9 @@ if(MonteCarloSampling){
   # fuzz <- 1e-7 * c(-delt, rep.int(delt, nB1))
   # breaks <- seq(0, 3, by = delt) + fuzz
   
-  RandGMMDataDiff = matrix(0,AnzBins,AnzRepetitions)
+  RandGMMDataDiff = matrix(0,AnzBins,NoRepetitions)
   #zukeunftig with parSapply
-  Ri=sapply(1:AnzRepetitions, function(i,...) return(RandomLogGMM(...)),Means,SDs,Weights,IsLogDistribution,AnzData)
+  Ri=sapply(1:NoRepetitions, function(i,...) return(RandomLogGMM(...)),Means,SDs,Weights,IsLogDistribution,AnzData)
   #zukeunftig with parApply
   RandNrInBini=apply(Ri,MARGIN = 2, function(R,BinLimits) hist(Re(abs(R)),c(0,BinLimits,max(abs(R))),plot=F)$counts,BinLimits)
   
@@ -149,7 +157,7 @@ if(MonteCarloSampling){
   # breaks <- seq(0, 3, by = delt) + fuzz
   #RandNrInBin=.Call(graphics:::C_BinCount, x, breaks, TRUE, TRUE)
   
-  for(i in 1:AnzRepetitions){
+  for(i in 1:NoRepetitions){
     #R = Ri[,i]#RandomLogGMM(Means,SDs,Weights,IsLogDistribution,AnzData)
     #BinLimits = c(0,BinLimits,max(abs(R)))
     #RandNrInBin = hist(Re(abs(R)),c(0,BinLimits,max(abs(R))),plot=F)$counts  # R's schnelle Funktion benutzen

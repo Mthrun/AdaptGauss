@@ -1,4 +1,4 @@
-KStestMixtures=function(Data,Means,SDs,Weights,IsLogDistribution=Means*0,PlotIt=FALSE,UpperLimit=max(Data,na.rm=TRUE),Silent=T){
+KStestMixtures=function(Data,Means,SDs,Weights,IsLogDistribution=Means*0,PlotIt=FALSE,UpperLimit=max(Data,na.rm=TRUE),NoRepetitions,Silent=TRUE){
 # res= KStestMixtures(Data,Means,SDs,Weights,IsLogDistribution,PlotIt,UpperLimit)
 # Kolmogorov-Smirnov Test Data vs a given Gauss Mixture Model
 #
@@ -93,14 +93,19 @@ regularize.values_spec <- function(x, y,HandleTiesFUN=meanC) {
              
 # Die Miller Funktion via Monte-Carlo errechnen
 AnzData =length(Data)
-AnzRepetitions = 1000
-if(AnzData<1000) AnzRepetitions = 2000
-if(AnzData<100)  AnzRepetitions = 5000
-    
-RandGMMDataDiff = matrix(0,AnzRepetitions,1)
-Ri=sapply(1:AnzRepetitions, function(i,...) return(RandomLogGMM(...)),Means,SDs,Weights,IsLogDistribution,AnzData)
+if(missing(NoRepetitions)){
+  NoRepetitions = 1000
+  if(AnzData<1000) NoRepetitions = 2000
+  if(AnzData<100)  NoRepetitions = 5000
+  
+}else{
+  if(as.numeric(NoRepetitions)<1) NoRepetitions=1
+}
 
-for(i in c(1:AnzRepetitions)){
+RandGMMDataDiff = matrix(0,NoRepetitions,1)
+Ri=sapply(1:NoRepetitions, function(i,...) return(RandomLogGMM(...)),Means,SDs,Weights,IsLogDistribution,AnzData)
+
+for(i in c(1:NoRepetitions)){
    #R = RandomLogGMM(Means,SDs,Weights,IsLogDistribution,AnzData)
    R = Ri[,i]
    #[RandCDF,RandKernels] = ecdfUnique(R)
@@ -121,9 +126,9 @@ for(i in c(1:AnzRepetitions)){
      #if(Sys.info()['sysname'] == 'Windows'){
       # if(i==1)
        #   pb <- winProgressBar(title = "progress bar", min = 0,
-     #                           max = AnzRepetitions, width = 300)
-     #  setWinProgressBar(pb, i, title=paste( round(i/AnzRepetitions*100, 0),"% done"))
-     #  if(i==AnzRepetitions) close(pb)
+     #                           max = NoRepetitions, width = 300)
+     #  setWinProgressBar(pb, i, title=paste( round(i/NoRepetitions*100, 0),"% done"))
+     #  if(i==NoRepetitions) close(pb)
     # }else{
        if(i %%10==0){
          cat('.')

@@ -19,6 +19,8 @@
   \item{SDs}{vector of standard deviations, estimated Gaussian Kernels, has to be the same length as Means}
   \item{Weights}{vector of relative number of points in Gaussians (prior probabilities), has to be the same length as Means}
   \item{IsLogDistribution}{Optional, ==1 if distribution(i) is a LogNormal, default vector of zeros of length 1:L}
+   \item{Plotter}{Optional, plotting package, either native or plotly}
+  
   \item{SingleColor}{Optional,Color for line plot of all the single gaussians, default magenta}
   \item{MixtureColor}{Optional,Color of line lot for the mixture default red}
 	\item{DataColor}{Optional,Color of line plot for the data, default black}
@@ -36,7 +38,7 @@
 \details{
 Example shows that overlapping variances of gaussians will result in inappropriate decision boundaries.
 }
-\author{Michael Thrun}
+\author{Michael Thrun, Quirin Stier}
 \examples{
 data=c(rnorm(1000),rnorm(2000)+2,rnorm(1000)*2-1)
 \donttest{
